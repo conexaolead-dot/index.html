@@ -593,7 +593,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--black);min
         <div id="op-admin-content">
           <div class="sec-label">Ferramentas</div>
           <div class="tools-block">
-            <a class="tool-row" href="https://docs.google.com/spreadsheets/d/1giWUgBfaoJ7McafDuEDQFrN_A93HIQylZGVeNCLBaEg/edit" target="_blank">
+            <a class="tool-row" href="https://docs.google.com/spreadsheets/d/1UuyBbI3BlOjd8m8XwmD5ONw2tNbnkz6z/edit" target="_blank">
               <div class="tr-icon" style="background:#fce8e8">📈</div>
               <div class="tr-body">
                 <div class="tr-name">Dashboard Operacional</div>
@@ -693,7 +693,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--black);min
             <div class="tr-body"><div class="tr-name">Modelo Financeiro</div><div class="tr-sub">Margem real por projeto e cliente</div></div>
             <span class="tr-arrow">↗</span>
           </a>
-          <a class="tool-row" href="https://docs.google.com/spreadsheets/d/1LBnAS4G0QQK8b559r8aXJ47SXvwCMSzA/edit" target="_blank">
+          <a class="tool-row" href="https://docs.google.com/spreadsheets/d/153LxlzdrmSt4ZvpsRdHVEdoQq5QEcjDqxTkR2hUfg-0/edit?gid=242807333#gid=242807333" target="_blank">
             <div class="tr-icon" style="background:var(--amber-l)">🧮</div>
             <div class="tr-body"><div class="tr-name">Simulador de Preço</div><div class="tr-sub">Desconto e margem automática por proposta</div></div>
             <span class="tr-arrow">↗</span>
@@ -783,18 +783,18 @@ const USERS = [
   { user:'Silmara',   pass:'Mudar@123', name:'Thais Silmara',    role:'sdr', avatar:'TS' },
   { user:'Andrielly', pass:'Mudar@123', name:'Andrielly Calleo', role:'sdr', avatar:'AN' },
   // Clientes
-  { user:'Tiga',        pass:'Tiga@2026',        name:'Tiga',        role:'cliente', avatar:'TI', projeto:'Tiga / Somos Nuvem' },
-  { user:'Doctoralia',  pass:'Doctoralia@2026',   name:'Doctoralia',  role:'cliente', avatar:'DO', projeto:'Doctoralia' },
-  { user:'ACISA',       pass:'ACISA@2026',        name:'ACISA',       role:'cliente', avatar:'AC', projeto:'Acisa' },
-  { user:'Setfree',     pass:'Setfree@2026',      name:'Setfree',     role:'cliente', avatar:'SF', projeto:'Setfree' },
-  { user:'ASPR',        pass:'ASPR@2026',         name:'ASPR',        role:'cliente', avatar:'AS', projeto:'ASPR Consultoria' },
-  { user:'FicarDeBem',  pass:'FicarDeBem@2026',   name:'Ficar de Bem',role:'cliente', avatar:'FB', projeto:'Ficar de Bem (CRAMI)' },
-  { user:'ACERIS',      pass:'ACERIS@2026',       name:'ACERIS',      role:'cliente', avatar:'AE', projeto:'ACERIS' },
-  { user:'Viga',        pass:'Viga@2026',         name:'Viga/Tegra',  role:'cliente', avatar:'VT', projeto:'Viga/Tegra' },
-  { user:'Lucrar',      pass:'Lucrar@2026',       name:'Lucrar',      role:'cliente', avatar:'LU', projeto:'Lucrar' },
-  { user:'AMC',         pass:'AMC@2026',          name:'AMC',         role:'cliente', avatar:'AM', projeto:'AMC' },
-  { user:'Gold',        pass:'Gold@2026',         name:'Gold',        role:'cliente', avatar:'GO', projeto:'Gold' },
-  { user:'Scorpion',    pass:'Scorpion@2026',     name:'Scorpion',    role:'cliente', avatar:'SC', projeto:'Scorpion' },
+  { user:'Tiga',       pass:'Tiga@2026',       name:'Tiga / Somos Nuvem', role:'cliente', avatar:'TI', projeto:'Tiga / Somos Nuvem' },
+  { user:'Doctoralia', pass:'Doctoralia@2026', name:'Doctoralia',         role:'cliente', avatar:'DO', projeto:'Doctoralia' },
+  { user:'Acisa',      pass:'Acisa@2026',      name:'Acisa',              role:'cliente', avatar:'AC', projeto:'Acisa' },
+  { user:'Setfree',    pass:'Setfree@2026',    name:'Setfree',            role:'cliente', avatar:'SF', projeto:'Setfree' },
+  { user:'ASPR',       pass:'ASPR@2026',       name:'ASPR Consultoria',   role:'cliente', avatar:'AS', projeto:'ASPR Consultoria' },
+  { user:'FicarDeBem', pass:'FicarDeBem@2026', name:'Ficar de Bem',       role:'cliente', avatar:'FB', projeto:'Ficar de Bem' },
+  { user:'Aceris',     pass:'Aceris@2026',     name:'Aceris',             role:'cliente', avatar:'AE', projeto:'Aceris' },
+  { user:'Vigo',       pass:'Vigo@2026',       name:'Vigo / Tegra',       role:'cliente', avatar:'VT', projeto:'Vigo/Tegra' },
+  { user:'Lucrare',    pass:'Lucrare@2026',    name:'Lucrare',            role:'cliente', avatar:'LU', projeto:'Lucrare' },
+  { user:'AMC',        pass:'AMC@2026',        name:'AMC / Amiggo',       role:'cliente', avatar:'AM', projeto:'AMC / Amiggo' },
+  { user:'Gold',       pass:'Gold@2026',       name:'Gold Piva Seguros',  role:'cliente', avatar:'GO', projeto:'Gold Piva Seguros' },
+  { user:'Scorpion',   pass:'Scorpion@2026',   name:'Scorpion',           role:'cliente', avatar:'SC', projeto:'Scorpion' },
 ];
 
 // ══ PERMISSÕES POR PERFIL ══
@@ -909,9 +909,9 @@ const d = new Date();
 
 
 // ══ URLs CSV - Google Sheets publicado ══
-const URL_SDRS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQBRUMxIGdWPjeDVZE_4IIFVgxVGhhCvnNkJHMOYU15fp2_ptP1799sTDnaGCtS5APndfP5GGkSlffl/pub?gid=1291192165&single=true&output=csv';
-const URL_MAPA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQBRUMxIGdWPjeDVZE_4IIFVgxVGhhCvnNkJHMOYU15fp2_ptP1799sTDnaGCtS5APndfP5GGkSlffl/pub?gid=908666178&single=true&output=csv';
-const URL_HIST = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQBRUMxIGdWPjeDVZE_4IIFVgxVGhhCvnNkJHMOYU15fp2_ptP1799sTDnaGCtS5APndfP5GGkSlffl/pub?gid=915213007&single=true&output=csv';
+const URL_SDRS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSLqJKoFEA6dolmYNSh2zJE_fvz8U5lFYniHfOXD4UJsvMB1ceup28XZPIBtHrxfJrRpG65OsP1eidS/pub?gid=1961498916&single=true&output=csv';
+const URL_MAPA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSLqJKoFEA6dolmYNSh2zJE_fvz8U5lFYniHfOXD4UJsvMB1ceup28XZPIBtHrxfJrRpG65OsP1eidS/pub?gid=501711199&single=true&output=csv';
+const URL_HIST = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSLqJKoFEA6dolmYNSh2zJE_fvz8U5lFYniHfOXD4UJsvMB1ceup28XZPIBtHrxfJrRpG65OsP1eidS/pub?gid=1675778247&single=true&output=csv';
 
 function parseCSV(text) {
   const lines = text.trim().split('\n');
