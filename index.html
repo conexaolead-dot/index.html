@@ -179,7 +179,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 </div>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbylKgNXAJIiwl27Rdqf5a_6wPt-MCBwSsMEq-0dcsIfsoeXgixdYCqdeWhvXvtAvSM9/exec';
+const API = 'https://script.google.com/macros/s/AKfycbzkf0O1nIfe2QTwhEU66v9wAIcEGXCmil3BB45GFjRTghSMSaupvftA3HuyjX8dwQgK/exec';
 
 let SESSION = null;
 
@@ -289,13 +289,13 @@ function renderHub() {
       id:'rec', cls:'rec', num:'03', nome:'Recrutamento',
       desc:'Candidatos, aprovações e processo seletivo',
       visivel: p === 'admin' || p === 'coordenadora',
-      onclick: "alert('Módulo em construção')"
+      onclick: 'renderRecrutamento()'
     },
     {
       id:'fin', cls:'fin', num:'04', nome:'Financeiro',
       desc:'Modelo financeiro e simulador de preço',
       visivel: p === 'admin',
-      onclick: "alert('Módulo em construção')"
+      onclick: "window.open('https://docs.google.com/spreadsheets/d/153LxlzdrmSt4ZvpsRdHVEdoQq5QEcjDqxTkR2hUfg-0/edit?gid=242807333#gid=242807333','_blank')"
     }
   ];
 
@@ -579,6 +579,126 @@ async function aprovarPlaybook() {
     else { alert('Erro: ' + data.erro); }
   } catch(e) { alert('Erro de conexão.'); }
 }
+
+// ── RECRUTAMENTO ─────────────────────────────────────────────
+async function renderRecrutamento() {
+  const mc = document.getElementById('module-content');
+  mc.innerHTML = '<div class="loading">Carregando candidatos...</div>';
+
+  try {
+    const data = await apiFetch({ acao: 'getCandidatos', perfil: SESSION.perfil });
+    if (!data.ok) { mc.innerHTML = '<p style="color:var(--red)">Erro: '+data.erro+'</p>'; return; }
+
+    const e1 = data.etapa1 || [];
+    const e2 = data.etapa2 || [];
+
+    const aprov1  = e1.filter(c => String(c.status).includes('Aprovado')).length;
+    const revisar = e1.filter(c => String(c.status).includes('REVISAR')).length;
+    const aprov2  = e2.filter(c => String(c.status).includes('APROVADO')).length;
+    const final   = e2.filter(c => String(c.statusFinal).toLowerCase().includes('entrevista')).length;
+
+    function tabelaEtapa(cands, etapa) {
+      if (!cands.length) return '<p style="color:var(--muted);font-size:13px;padding:.5rem 0">Nenhum candidato nesta etapa.</p>';
+      return `<div style="overflow-x:auto"><table class="data-table">
+        <thead><tr>
+          <th>Nome</th><th>Email</th>
+          ${etapa===1?'<th>Telefone</th>':''}
+          <th>Score</th><th>Status</th>
+          ${etapa===1?'<th>Teste env.</th>':'<th>Status Final</th>'}
+          <th>Observação</th><th>Ações</th>
+        </tr></thead>
+        <tbody>
+          ${cands.map(c => `<tr>
+            <td><strong>${c.nome||''}</strong></td>
+            <td style="font-size:12px">${c.email||''}</td>
+            ${etapa===1?`<td style="font-size:12px">${c.telefone||''}</td>`:''}
+            <td style="text-align:center">
+              <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;color:${Number(c.score)>=(etapa===1?12:10)?'var(--green)':Number(c.score)>=(etapa===1?8:7)?'var(--amber)':'var(--red)'}">${c.score||0}</span>
+            </td>
+            <td><span class="status-badge ${recStatusCls(etapa===1?c.status:c.status)}">${etapa===1?(c.status||'—'):(c.status||'—')}</span></td>
+            ${etapa===1
+              ? `<td style="text-align:center">${String(c.testeEnv).toUpperCase()==='SIM'?'<span style="color:var(--green);font-weight:700">✓</span>':'<span style="color:var(--muted)">—</span>'}</td>`
+              : `<td style="font-size:12px"><span class="status-badge ${recStatusCls(c.statusFinal)}">${c.statusFinal||'—'}</span></td>`
+            }
+            <td style="font-size:12px;color:var(--muted);max-width:160px">${c.obs||''}</td>
+            <td><div style="display:flex;gap:5px">
+              <button onclick="aprovarCandidato(${c.linha},${etapa},'${escJs(c.nome)}')" style="padding:4px 8px;font-size:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.05em;border:none;border-radius:3px;background:var(--green);color:#fff;cursor:pointer">✓ APR</button>
+              <button onclick="reprovarCandidato(${c.linha},${etapa},'${escJs(c.nome)}')" style="padding:4px 8px;font-size:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.05em;border:none;border-radius:3px;background:var(--red);color:#fff;cursor:pointer">✗ REP</button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>`;
+    }
+
+    mc.innerHTML = `
+      <div class="section-wrap">
+        <div class="section-header">
+          <div class="section-title">Recrutamento & Seleção</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <a href="https://docs.google.com/spreadsheets/d/1vPDBACscOT3qJQ220Hh8fWzugHOZnxcQQpBorZve0s4/edit" target="_blank" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--muted);text-decoration:none">Ver planilha ↗</a>
+            <button class="back-btn" onclick="document.getElementById('module-content').innerHTML=''">← Voltar</button>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-val">${e1.length}</div><div class="stat-lbl">1ª etapa</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--green)">${aprov1}</div><div class="stat-lbl">Aprovados triagem</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--amber)">${revisar}</div><div class="stat-lbl">Para revisar</div></div>
+          <div class="stat-card"><div class="stat-val">${e2.length}</div><div class="stat-lbl">2ª etapa</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--green)">${aprov2}</div><div class="stat-lbl">Aprovados teste</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--purple)">${final}</div><div class="stat-lbl">Entrevista</div></div>
+        </div>
+
+        <div style="margin-bottom:1.5rem">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:.75rem;padding-bottom:4px;border-bottom:1px solid var(--border)">
+            Etapa 1 — Triagem inicial (${e1.length} candidatos)
+          </div>
+          ${tabelaEtapa(e1, 1)}
+        </div>
+
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:.75rem;padding-bottom:4px;border-bottom:1px solid var(--border)">
+            Etapa 2 — Teste prático (${e2.length} candidatos)
+          </div>
+          ${tabelaEtapa(e2, 2)}
+        </div>
+      </div>`;
+  } catch(e) {
+    mc.innerHTML = '<p style="color:var(--red)">Erro de conexão. Tente novamente.</p>';
+  }
+}
+
+function recStatusCls(s) {
+  if (!s) return '';
+  const sl = String(s).toLowerCase();
+  if (sl.includes('aprovado')) return 'status-ok';
+  if (sl.includes('revisar'))  return 'status-risco';
+  if (sl.includes('reprovado'))return 'status-critico';
+  return '';
+}
+
+function escJs(str) {
+  return String(str).replace(/'/g, "\'").replace(/"/g, '\"');
+}
+
+async function aprovarCandidato(linha, etapa, nome) {
+  if (!confirm('Aprovar ' + nome + '?')) return;
+  const campo = etapa === 1 ? 'Status' : 'Status Teste';
+  const valor = etapa === 1 ? '✅ Aprovado - Revisão Manual' : 'APROVADO';
+  const data  = await apiFetch({ acao:'atualizarCandidato', perfil:SESSION.perfil, linha, campo, valor, etapa });
+  if (data.ok) { alert('✓ ' + nome + ' aprovado!'); renderRecrutamento(); }
+  else alert('Erro: ' + data.erro);
+}
+
+async function reprovarCandidato(linha, etapa, nome) {
+  if (!confirm('Reprovar ' + nome + '?')) return;
+  const campo = etapa === 1 ? 'Status' : 'Status Teste';
+  const valor = '❌ Reprovado';
+  const data  = await apiFetch({ acao:'atualizarCandidato', perfil:SESSION.perfil, linha, campo, valor, etapa });
+  if (data.ok) { alert('✗ ' + nome + ' reprovado.'); renderRecrutamento(); }
+  else alert('Erro: ' + data.erro);
+}
+
 </script>
 </body>
 </html>
