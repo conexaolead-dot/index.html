@@ -188,6 +188,28 @@ let SESSION = null;
 // para produção substitua pelo base64 completo do Logo.png
 
 // ── LOGIN ────────────────────────────────────────────────────
+// ── JSONP helper (resolve CORS do Apps Script) ──────────────
+let _cbCount = 0;
+function apiFetch(payload) {
+  return new Promise((resolve, reject) => {
+    const cbName = '_cb' + (++_cbCount);
+    const url = API + '?callback=' + cbName + '&payload=' + encodeURIComponent(JSON.stringify(payload));
+    const script = document.createElement('script');
+    window[cbName] = (data) => {
+      delete window[cbName];
+      document.body.removeChild(script);
+      resolve(data);
+    };
+    script.onerror = () => {
+      delete window[cbName];
+      document.body.removeChild(script);
+      reject(new Error('Erro de conexão'));
+    };
+    script.src = url;
+    document.body.appendChild(script);
+  });
+}
+
 async function doLogin() {
   const usuario = document.getElementById('inp-usuario').value.trim();
   const senha   = document.getElementById('inp-senha').value.trim();
@@ -200,17 +222,12 @@ async function doLogin() {
   err.style.display = 'none';
 
   try {
-    const res  = await fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ acao: 'login', usuario, senha })
-    });
-    const data = await res.json();
-
+    const data = await apiFetch({ acao: 'login', usuario, senha });
     if (data.ok) {
       SESSION = { usuario: data.usuario, perfil: data.perfil.toLowerCase(), projeto: data.projeto };
       abrirPainel();
     } else {
+      err.textContent = 'Usuário ou senha incorretos. Tente novamente.';
       err.style.display = 'block';
       btn.disabled = false;
       btn.textContent = 'Entrar';
@@ -309,12 +326,7 @@ async function renderOperacional() {
   mc.innerHTML = '<div class="loading">Carregando clientes...</div>';
 
   try {
-    const res  = await fetch(API, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ acao:'getClientes', perfil:SESSION.perfil, projeto:SESSION.projeto })
-    });
-    const data = await res.json();
+    const data = await apiFetch({ acao:'getClientes', perfil:SESSION.perfil, projeto:SESSION.projeto });
 
     if (!data.ok) { mc.innerHTML = '<p style="color:var(--red)">Erro: '+data.erro+'</p>'; return; }
 
@@ -384,12 +396,7 @@ async function renderCliente() {
   mc.innerHTML = '<div class="loading">Carregando seu painel...</div>';
 
   try {
-    const res  = await fetch(API, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ acao:'getOnboarding', projeto:SESSION.projeto })
-    });
-    const data = await res.json();
+    const data = await apiFetch({ acao:'getOnboarding', projeto:SESSION.projeto });
     const onb  = data.dados;
 
     const onbFeito    = onb && onb.STATUS_ONBOARDING === 'Respondido';
@@ -549,12 +556,7 @@ async function enviarOnboarding() {
   };
 
   try {
-    const res  = await fetch(API, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ acao:'salvarOnboarding', projeto:SESSION.projeto, respostas:r })
-    });
-    const data = await res.json();
+    const data = await apiFetch({ acao:'salvarOnboarding', projeto:SESSION.projeto, respostas:r });
     if (data.ok) {
       msg.style.color = 'var(--green)';
       msg.textContent = '✓ Enviado com sucesso!';
@@ -572,12 +574,7 @@ async function enviarOnboarding() {
 async function aprovarPlaybook() {
   if (!confirm('Confirma a aprovação do Playbook?')) return;
   try {
-    const res  = await fetch(API, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ acao:'aprovarPlaybook', projeto:SESSION.projeto })
-    });
-    const data = await res.json();
+    const data = await apiFetch({ acao:'aprovarPlaybook', projeto:SESSION.projeto });
     if (data.ok) { alert('Playbook aprovado! Obrigado.'); renderCliente(); }
     else { alert('Erro: ' + data.erro); }
   } catch(e) { alert('Erro de conexão.'); }
